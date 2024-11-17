@@ -1,7 +1,6 @@
 package edu.upc.dsa.models;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class User {
@@ -9,15 +8,15 @@ public class User {
     private String name;
     private String surname;
     private String email;
-    private Date birthDate;
+    private String birthDate;  // 改为 String 类型
 
     // Constructor
-    public User(String id, String name, String surname, String email, Date birthDate) {
+    public User(String id, String name, String surname, String email, String birthDate) {
         this.id = id;
         this.name = name;
         this.surname = surname;
         this.email = email;
-        this.birthDate = birthDate;
+        this.birthDate = birthDate;  // 直接设置为字符串
     }
 
     // Getters and Setters
@@ -53,20 +52,22 @@ public class User {
         this.email = email;
     }
 
-    public Date getBirthDate() {
+    public String getBirthDate() {
         return birthDate;
     }
 
-    public void setBirthDate(Date birthDate) {
+    public void setBirthDate(String birthDate) {
         this.birthDate = birthDate;
     }
+
+    // Main method to test the functionality
     public static void main(String[] args) {
-        // Create new users without SimpleDateFormat
-        User user1 = new User("1", "Alice", "Smith", "alice.smith@email.com", new Date(90, 0, 1)); // 1990-01-01
-        User user2 = new User("2", "Bob", "Johnson", "bob.johnson@email.com", new Date(85, 2, 15)); // 1985-03-15
-        User user3 = new User("3", "Charlie", "Williams", "charlie.williams@email.com", new Date(92, 6, 21)); // 1992-07-21
-        User user4 = new User("4", "David", "Brown", "david.brown@email.com", new Date(88, 8, 10)); // 1988-09-10
-        User user5 = new User("5", "Eve", "Davis", "eve.davis@email.com", new Date(95, 10, 5)); // 1995-11-05
+        // Create new users with String birthDate format "yyyy/MM/dd"
+        User user1 = new User("1", "Alice", "Smith", "alice.smith@email.com", "1990/01/01");
+        User user2 = new User("2", "Bob", "Johnson", "bob.johnson@email.com", "1985/03/15");
+        User user3 = new User("3", "Charlie", "Williams", "charlie.williams@email.com", "1992/07/21");
+        User user4 = new User("4", "David", "Brown", "david.brown@email.com", "1988/09/10");
+        User user5 = new User("5", "Eve", "Davis", "eve.davis@email.com", "1995/11/05");
 
         // Add them to a list
         List<User> users = new ArrayList<>();

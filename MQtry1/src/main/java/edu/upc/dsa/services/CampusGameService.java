@@ -11,7 +11,6 @@ import org.apache.log4j.Logger;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import java.util.Date;
 import java.util.List;
 
 @Api(value = "/campusGame", description = "Campus Game Service")
@@ -21,15 +20,15 @@ public class CampusGameService {
     private static final Logger logger = Logger.getLogger(CampusGameService.class);
     private CampusGameManager manager;
 
-    // 单例模式实现
+    // Singleton pattern
     private static CampusGameService instance;
 
-    // 私有构造函数
+    // Private constructor
     private CampusGameService(CampusGameManager manager) {
         this.manager = manager;
     }
 
-    // 获取单例实例
+    // Singleton pattern
     public static CampusGameService getInstance(CampusGameManager manager) {
         if (instance == null) {
             instance = new CampusGameService(manager);
@@ -49,6 +48,7 @@ public class CampusGameService {
             logger.info(String.format("addUser - User added: %s", user.getId()));
         } catch (Exception e) {
             logger.error(String.format("addUser - Error adding user: %s", user.getId()), e);
+            throw new WebApplicationException("Error adding user", e);
         }
     }
 
@@ -64,7 +64,7 @@ public class CampusGameService {
             return users;
         } catch (Exception e) {
             logger.error("getUsers - Error retrieving users", e);
-            return null;
+            throw new WebApplicationException("Error retrieving users", e);
         }
     }
 
@@ -80,7 +80,7 @@ public class CampusGameService {
             return user;
         } catch (Exception e) {
             logger.error(String.format("getUser - Error retrieving user with id: %s", userId), e);
-            return null;
+            throw new WebApplicationException("Error retrieving user", e);
         }
     }
 
@@ -98,6 +98,7 @@ public class CampusGameService {
         } catch (Exception e) {
             logger.error(String.format("addPointOfInterest - Error adding point at (%d, %d) of type %s",
                     pointOfInterest.getX(), pointOfInterest.getY(), pointOfInterest.getType()), e);
+            throw new WebApplicationException("Error adding point of interest", e);
         }
     }
 
@@ -113,7 +114,7 @@ public class CampusGameService {
             return points;
         } catch (Exception e) {
             logger.error(String.format("getPointsByType - Error retrieving points of type %s", type), e);
-            return null;
+            throw new WebApplicationException("Error retrieving points by type", e);
         }
     }
 
@@ -129,6 +130,51 @@ public class CampusGameService {
             logger.info(String.format("registerUserVisit - User %s visited point (%d, %d)", userVisit.getUserId(), userVisit.getX(), userVisit.getY()));
         } catch (Exception e) {
             logger.error(String.format("registerUserVisit - Error registering visit for user %s at (%d, %d)", userVisit.getUserId(), userVisit.getX(), userVisit.getY()), e);
+            throw new WebApplicationException("Error registering user visit", e);
+        }
+    }
+
+    @ApiOperation(value = "Get user visits", response = List.class)
+    @GET
+    @Path("/userVisits/{userId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<UserVisit> getUserVisits(@ApiParam(value = "User ID", required = true) @PathParam("userId") String userId) {
+        logger.info(String.format("getUserVisits - Parameters: userId=%s", userId));
+        try {
+            // 确保 manager 已初始化
+            if (this.manager == null) {
+                throw new WebApplicationException("CampusGameManager is not initialized");
+            }
+
+            List<UserVisit> visits = this.manager.getUserVisits(userId);
+            if (visits == null || visits.isEmpty()) {
+                logger.warn(String.format("getUserVisits - No visits found for userId=%s", userId));
+                throw new WebApplicationException(String.format("No visits found for user %s", userId), 404);
+            }
+
+            logger.info(String.format("getUserVisits - Returning %d visits for userId=%s", visits.size(), userId));
+            return visits;
+        } catch (Exception e) {
+            logger.error(String.format("getUserVisits - Error retrieving visits for userId=%s", userId), e);
+            throw new WebApplicationException("Error retrieving user visits", e);
+        }
+    }
+
+    @ApiOperation(value = "Get users by point", response = List.class)
+    @GET
+    @Path("/usersByPoint")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<User> getUsersByPoint(
+            @ApiParam(value = "X coordinate", required = true) @QueryParam("x") int x,
+            @ApiParam(value = "Y coordinate", required = true) @QueryParam("y") int y) {
+        logger.info(String.format("getUsersByPoint - Parameters: x=%d, y=%d", x, y));
+        try {
+            List<User> users = this.manager.getUsersByPoint(x, y);
+            logger.info(String.format("getUsersByPoint - Returning %d users for point (%d, %d)", users.size(), x, y));
+            return users;
+        } catch (Exception e) {
+            logger.error(String.format("getUsersByPoint - Error retrieving users for point (%d, %d)", x, y), e);
+            throw new WebApplicationException("Error retrieving users by point", e);
         }
     }
 }

@@ -19,95 +19,107 @@ public class CampusGameManagerTest {
     public void setUp() {
         this.campusGameService = new CampusGameManagerImpl();
 
-        // 添加一些用户和兴趣点以便测试
-        this.campusGameService.addUser("1", "Alice", "Smith", "alice@example.com", new Date());
-        this.campusGameService.addUser("2", "Jane", "Doe", "jane@example.com", new Date());
+        // Add some users and points of interest for testing
+        this.campusGameService.addUser("101", "Eve", "Johnson", "eve@example.com", String.valueOf(new Date()));
+        this.campusGameService.addUser("102", "Mark", "Taylor", "mark@example.com", String.valueOf(new Date()));
 
-        this.campusGameService.addPointOfInterest(10, 20, PointOfInterest.ElementType.BRIDGE);
-        this.campusGameService.addPointOfInterest(30, 40, PointOfInterest.ElementType.SWORD);
+        this.campusGameService.addPointOfInterest(15, 25, PointOfInterest.ElementType.TREE);
+        this.campusGameService.addPointOfInterest(35, 45, PointOfInterest.ElementType.BRIDGE);
     }
 
     @After
     public void tearDown() {
-        // 清理操作（如果需要）
-        // 在这个例子中，数据清理由CampusGameManagerImpl类完成
+        // Cleanup data if necessary
+        campusGameService = null;
     }
 
     @Test
     public void addUserTest() {
         Assert.assertEquals(2, campusGameService.getUsers().size());
 
-        this.campusGameService.addUser("3", "Carlos", "Perez", "carlos@example.com", new Date());
+        this.campusGameService.addUser("103", "Sophia", "Lopez", "sophia@example.com", String.valueOf(new Date()));
 
         Assert.assertEquals(3, campusGameService.getUsers().size());
     }
 
     @Test
     public void listUsersTest() {
-        // 获取所有用户
+        // Retrieve all users
         List<User> users = campusGameService.getUsers();
 
-        // 根据姓氏排序后，第一个用户应该是 "Jane Doe"
-        Assert.assertEquals("Jane", users.get(0).getName());
-        Assert.assertEquals("Doe", users.get(0).getSurname());
 
-        // 第二个用户应该是 "Alice Smith"
-        Assert.assertEquals("Alice", users.get(1).getName());
-        Assert.assertEquals("Smith", users.get(1).getSurname());
+        // The second user should be "Eve Johnson"
+        Assert.assertEquals("Eve", users.get(0).getName());
+        Assert.assertEquals("Johnson", users.get(0).getSurname());
+
+        // The third user should be "Mark Taylor"
+        Assert.assertEquals("Mark", users.get(1).getName());
+        Assert.assertEquals("Taylor", users.get(1).getSurname());
     }
 
     @Test
     public void getUserTest() {
-        User user = campusGameService.getUser("1");
-        Assert.assertEquals("Alice", user.getName());
-        Assert.assertEquals("Smith", user.getSurname());
+        User user = campusGameService.getUser("101");
+        Assert.assertEquals("Eve", user.getName());
+        Assert.assertEquals("Johnson", user.getSurname());
 
-        // 测试不存在的用户
+        // Test for a non-existent user
         Assert.assertNull(campusGameService.getUser("999"));
     }
 
     @Test
     public void addPointOfInterestTest() {
-        Assert.assertEquals(1, campusGameService.getPointsByType(PointOfInterest.ElementType.BRIDGE).size());
-
-        this.campusGameService.addPointOfInterest(50, 60, PointOfInterest.ElementType.TREE);
-
         Assert.assertEquals(1, campusGameService.getPointsByType(PointOfInterest.ElementType.TREE).size());
+
+        this.campusGameService.addPointOfInterest(55, 65, PointOfInterest.ElementType.COIN);
+
+        Assert.assertEquals(1, campusGameService.getPointsByType(PointOfInterest.ElementType.COIN).size());
     }
 
     @Test
     public void userVisitPointTest() {
-        this.campusGameService.registerUserVisit("1", 10, 20);
+        this.campusGameService.registerUserVisit("102", 15, 25);
 
-        List<PointOfInterest> visits = campusGameService.getUserVisits("1");
+        List<UserVisit> visits = campusGameService.getUserVisits("102");
         Assert.assertEquals(1, visits.size());
-        Assert.assertEquals(10, visits.get(0).getX());
-        Assert.assertEquals(20, visits.get(0).getY());
+        Assert.assertEquals(15, visits.get(0).getX());
+        Assert.assertEquals(25, visits.get(0).getY());
+
+        // Test user visit record
+        UserVisit userVisit = campusGameService.getUserVisits("102").get(0);
+        Assert.assertNotNull(userVisit);
+        Assert.assertEquals("102", userVisit.getUserId());
+        Assert.assertEquals(15, userVisit.getPoint().getX());
+        Assert.assertEquals(25, userVisit.getPoint().getY());
     }
 
     @Test
     public void getUsersByPointTest() {
-        // 用户1访问了位置(10, 20)
-        this.campusGameService.registerUserVisit("1", 10, 20);
+        // 添加兴趣点并确保访问
+        this.campusGameService.registerUserVisit("101", 15, 25);
 
-        List<User> usersAtPoint = campusGameService.getUsersByPoint(10, 20);
+        List<User> usersAtPoint = campusGameService.getUsersByPoint(15, 25);
         Assert.assertEquals(1, usersAtPoint.size());
-        Assert.assertEquals("Alice", usersAtPoint.get(0).getName());
+        Assert.assertEquals("Eve", usersAtPoint.get(0).getName());
 
-        // 测试兴趣点不存在的情况
-        List<User> noUsers = campusGameService.getUsersByPoint(100, 100);
-        Assert.assertTrue(noUsers.isEmpty());
+        // 测试不存在的兴趣点
+        try {
+            this.campusGameService.getUsersByPoint(100, 200);
+            Assert.fail("Expected IllegalArgumentException not thrown");
+        } catch (IllegalArgumentException e) {
+            Assert.assertEquals("Point of interest not found", e.getMessage());
+        }
     }
 
     @Test
     public void getPointsByTypeTest() {
         List<PointOfInterest> points = campusGameService.getPointsByType(PointOfInterest.ElementType.BRIDGE);
         Assert.assertEquals(1, points.size());
-        Assert.assertEquals(10, points.get(0).getX());
-        Assert.assertEquals(20, points.get(0).getY());
+        Assert.assertEquals(35, points.get(0).getX());
+        Assert.assertEquals(45, points.get(0).getY());
 
-        // 测试不存在的类型
-        points = campusGameService.getPointsByType(PointOfInterest.ElementType.COIN);
+        // Test for a non-existent type
+        points = campusGameService.getPointsByType(PointOfInterest.ElementType.SWORD);
         Assert.assertTrue(points.isEmpty());
     }
 }

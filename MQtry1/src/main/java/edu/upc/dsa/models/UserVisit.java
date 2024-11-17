@@ -43,14 +43,19 @@ public class UserVisit {
     // Example main method with some UserVisit objects
     public static void main(String[] args) {
         // Creating some Points of Interest (POI)
-        PointOfInterest poi1 = new PointOfInterest(10, 20, PointOfInterest.ElementType.TREE);
-        PointOfInterest poi2 = new PointOfInterest(15, 25, PointOfInterest.ElementType.POTION);
-        PointOfInterest poi3 = new PointOfInterest(30, 40, PointOfInterest.ElementType.DOOR);
+        User user1 = new User("1", "Alice", "Smith", "alice.smith@email.com", "1990/01/01");
+        User user2 = new User("2", "Bob", "Johnson", "bob.johnson@email.com", "1985/03/15");
+        User user3 = new User("3", "Charlie", "Williams", "charlie.williams@email.com", "1992/07/21");
 
-        // Creating some UserVisits for each POI
-        UserVisit visit1 = new UserVisit("1", poi1); // User 1 visits a tree at (10, 20)
-        UserVisit visit2 = new UserVisit("2", poi2); // User 2 visits a potion at (15, 25)
-        UserVisit visit3 = new UserVisit("3", poi3); // User 3 visits a door at (30, 40)
+        // 使用之前创建的兴趣点
+        PointOfInterest poi1 = PointOfInterest.getDefaultPoint(PointOfInterest.ElementType.TREE);  // 假设树的默认位置是 (7, 7)
+        PointOfInterest poi2 = PointOfInterest.getDefaultPoint(PointOfInterest.ElementType.POTION);  // 假设药水的默认位置是 (3, 3)
+        PointOfInterest poi3 = PointOfInterest.getDefaultPoint(PointOfInterest.ElementType.DOOR);    // 假设门的默认位置是 (0, 0)
+
+        // 创建 UserVisit 对象
+        UserVisit visit1 = new UserVisit(user1.getId(), poi1);  // Alice 访问树
+        UserVisit visit2 = new UserVisit(user2.getId(), poi2);  // Bob 访问药水
+        UserVisit visit3 = new UserVisit(user3.getId(), poi3);  // Charlie 访问门
 
         // Adding visits to a list
         List<UserVisit> userVisits = new ArrayList<>();

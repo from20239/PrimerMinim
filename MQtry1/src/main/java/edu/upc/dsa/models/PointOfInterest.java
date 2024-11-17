@@ -42,7 +42,7 @@ public class PointOfInterest {
     public enum ElementType {
         DOOR, WALL, BRIDGE, POTION, SWORD, COIN, GRASS, TREE
     }
-    // Method to get default points for each type
+    // Method to get default points for each type as example
     public static PointOfInterest getDefaultPoint(ElementType type) {
         switch (type) {
             case DOOR:
